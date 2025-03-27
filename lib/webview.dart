@@ -550,7 +550,6 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
                     allowContentAccess: true,
                     allowFileAccess: true,
                     javaScriptCanOpenWindowsAutomatically: true,
-                    cacheEnabled: true,
                     allowUniversalAccessFromFileURLs: true,
                     allowFileAccessFromFileURLs: true,
                   ),
