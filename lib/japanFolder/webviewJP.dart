@@ -109,7 +109,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
 
   Future<bool> _isImageAvailable(String url) async {
     try {
-      final response = await http.head(Uri.parse(url)).timeout(Duration(seconds: 2));
+      final response = await http.head(Uri.parse(url)).timeout(Duration(seconds: 3));
       return response.statusCode == 200;
     } catch (e) {
       return false;
@@ -550,9 +550,29 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                     allowsInlineMediaPlayback: true,
                     allowContentAccess: true,
                     allowFileAccess: true,
+                    cacheEnabled: true,
                     javaScriptCanOpenWindowsAutomatically: true,
                     allowUniversalAccessFromFileURLs: true,
                     allowFileAccessFromFileURLs: true,
+                    // Performance Optimizations
+                    transparentBackground: true, // Helps rendering performance
+                    thirdPartyCookiesEnabled: true, // Allow third-party cookies if needed
+                    domStorageEnabled: true, // Enable DOM storage for faster data retrieval
+                    databaseEnabled: true, // Enable WebSQL database if the webpage uses it
+                    hardwareAcceleration: true, // Improves rendering performance
+                    supportMultipleWindows: false, // Prevents multiple windows overhead
+                    useWideViewPort: true, // Enables responsive content loading
+                    loadWithOverviewMode: true, // Ensures pages fit the screen properly
+                    mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW, // Loads both HTTP & HTTPS for compatibility
+                    // Scroll & Rendering Optimizations
+                    verticalScrollBarEnabled: false, // Hides scrollbars for better UI
+                    horizontalScrollBarEnabled: false,
+                    overScrollMode: OverScrollMode.NEVER, // Disables overscroll effect
+                    forceDark: ForceDark.OFF, // Avoid forced dark mode issues
+                    forceDarkStrategy: ForceDarkStrategy.WEB_THEME_DARKENING_ONLY, // Ensures correct dark mode handling
+                    // Caching & Storage Optimization
+                    saveFormData: true, // Saves input form data for faster loading
+                    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36", // Custom user agent for better compatibility
                   ),
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) {
