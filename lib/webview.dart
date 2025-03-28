@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'auto_update.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mime/mime.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
@@ -60,6 +60,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
 
     AutoUpdate.checkForUpdate(context);
   }
+
   Future<void> _loadPhOrJp() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -271,6 +272,43 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
       return false;
     } else {
       return true;
+    }
+  }
+
+  // Function to check if a URL is a download link
+  bool _isDownloadableUrl(String url) {
+    final mimeType = lookupMimeType(url);
+    if (mimeType == null) return false;
+
+    // List of common download file extensions
+    const downloadableExtensions = [
+      'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+      'zip', 'rar', '7z', 'tar', 'gz',
+      'apk', 'exe', 'dmg', 'pkg',
+      'jpg', 'jpeg', 'png', 'gif', 'bmp',
+      'mp3', 'wav', 'ogg',
+      'mp4', 'avi', 'mov', 'mkv',
+      'txt', 'csv', 'json', 'xml'
+    ];
+
+    return downloadableExtensions.any((ext) => url.toLowerCase().contains('.$ext'));
+  }
+
+  // Function to launch URL in external browser
+  Future<void> _launchInBrowser(String url) async {
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Could not launch browser",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -553,27 +591,24 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
                     javaScriptCanOpenWindowsAutomatically: true,
                     allowUniversalAccessFromFileURLs: true,
                     allowFileAccessFromFileURLs: true,
-                    // Performance Optimizations
-                    transparentBackground: true, // Helps rendering performance
-                    thirdPartyCookiesEnabled: true, // Allow third-party cookies if needed
-                    domStorageEnabled: true, // Enable DOM storage for faster data retrieval
-                    databaseEnabled: true, // Enable WebSQL database if the webpage uses it
-                    hardwareAcceleration: true, // Improves rendering performance
-                    supportMultipleWindows: false, // Prevents multiple windows overhead
-                    useWideViewPort: true, // Enables responsive content loading
-                    loadWithOverviewMode: true, // Ensures pages fit the screen properly
-                    mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW, // Loads both HTTP & HTTPS for compatibility
-                    // Scroll & Rendering Optimizations
-                    verticalScrollBarEnabled: false, // Hides scrollbars for better UI
+                    useOnDownloadStart: true,
+                    transparentBackground: true,
+                    thirdPartyCookiesEnabled: true,
+                    domStorageEnabled: true,
+                    databaseEnabled: true,
+                    hardwareAcceleration: true,
+                    supportMultipleWindows: false,
+                    useWideViewPort: true,
+                    loadWithOverviewMode: true,
+                    mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+                    verticalScrollBarEnabled: false,
                     horizontalScrollBarEnabled: false,
-                    overScrollMode: OverScrollMode.NEVER, // Disables overscroll effect
-                    forceDark: ForceDark.OFF, // Avoid forced dark mode issues
-                    forceDarkStrategy: ForceDarkStrategy.WEB_THEME_DARKENING_ONLY, // Ensures correct dark mode handling
-                    // Caching & Storage Optimization
-                    saveFormData: true, // Saves input form data for faster loading
-                    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36", // Custom user agent for better compatibility
+                    overScrollMode: OverScrollMode.NEVER,
+                    forceDark: ForceDark.OFF,
+                    forceDarkStrategy: ForceDarkStrategy.WEB_THEME_DARKENING_ONLY,
+                    saveFormData: true,
+                    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
                   ),
-
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) {
                     webViewController = controller;
@@ -617,22 +652,19 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
                       action: allGranted ? PermissionResponseAction.GRANT : PermissionResponseAction.DENY,
                     );
                   },
-                  onDownloadStartRequest: (controller, url) async {
-                    Fluttertoast.showToast(
-                      msg: "Downloading: ${url.url}",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                    );
+                  // Handle download links by opening in external browser
+                  shouldOverrideUrlLoading: (controller, navigationAction) async {
+                    final url = navigationAction.request.url?.toString() ?? '';
 
-                    PermissionStatus storageStatus = await Permission.storage.request();
-                    if (!storageStatus.isGranted) {
-                      Fluttertoast.showToast(
-                        msg: "Storage permission denied! Download may fail.",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        backgroundColor: Colors.red,
-                      );
+                    if (_isDownloadableUrl(url)) {
+                      await _launchInBrowser(url);
+                      return NavigationActionPolicy.CANCEL;
                     }
+                    return NavigationActionPolicy.ALLOW;
+                  },
+                  // Also handle explicit download requests
+                  onDownloadStartRequest: (controller, downloadStartRequest) async {
+                    await _launchInBrowser(downloadStartRequest.url.toString());
                   },
                 ),
               if (_isLoading)

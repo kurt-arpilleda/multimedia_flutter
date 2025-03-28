@@ -45,6 +45,11 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>https</string>
+      <string>http</string>
+    </array>
 
     <!-- Network Security Configuration -->
     <key>NSAppTransportSecurity</key>
