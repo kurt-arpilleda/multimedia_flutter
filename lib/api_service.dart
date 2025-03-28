@@ -61,22 +61,22 @@ class ApiService {
             }
           }
         } catch (e) {
-          print("Error accessing $apiUrl on attempt $attempt");
-          _showToast("Error accessing $apiUrl on attempt $attempt");
+          // print("Error accessing $apiUrl on attempt $attempt");
+          // _showToast("Error accessing $apiUrl on attempt $attempt");
 
           if (i == 0 && apiUrls.length > 1) {
-            _showToast("Falling back to ${apiUrls[1]}");
+            // _showToast("Falling back to ${apiUrls[1]}");
           }
         }
       }
       if (attempt < maxRetries) {
         final delay = initialRetryDelay * (1 << (attempt - 1));
-        print("Waiting for ${delay.inSeconds} seconds before retrying...");
-        _showToast("Waiting for ${delay.inSeconds} seconds before retrying...");
+        // print("Waiting for ${delay.inSeconds} seconds before retrying...");
+        // _showToast("Waiting for ${delay.inSeconds} seconds before retrying...");
         await Future.delayed(delay);
       }
     }
-    _showToast("All API URLs are unreachable after $maxRetries attempts");
+    // _showToast("All API URLs are unreachable after $maxRetries attempts");
     throw Exception("All API URLs are unreachable after $maxRetries attempts");
   }
 
@@ -96,12 +96,12 @@ class ApiService {
             return data["success"] == true;
           }
         } catch (e) {
-          print("Error accessing $apiUrl on attempt $attempt: $e");
+          // print("Error accessing $apiUrl on attempt $attempt: $e");
         }
       }
       if (attempt < maxRetries) {
         final delay = initialRetryDelay * (1 << (attempt - 1));
-        print("Waiting for ${delay.inSeconds} seconds before retrying...");
+        // print("Waiting for ${delay.inSeconds} seconds before retrying...");
         await Future.delayed(delay);
       }
     }
@@ -120,12 +120,12 @@ class ApiService {
             return data["success"] == true ? data : throw Exception(data["message"]);
           }
         } catch (e) {
-          print("Error accessing $apiUrl on attempt $attempt: $e");
+          // print("Error accessing $apiUrl on attempt $attempt: $e");
         }
       }
       if (attempt < maxRetries) {
         final delay = initialRetryDelay * (1 << (attempt - 1));
-        print("Waiting for ${delay.inSeconds} seconds before retrying...");
+        // print("Waiting for ${delay.inSeconds} seconds before retrying...");
         await Future.delayed(delay);
       }
     }
@@ -147,12 +147,12 @@ class ApiService {
             if (data["success"] == true) return;
           }
         } catch (e) {
-          print("Error accessing $apiUrl on attempt $attempt: $e");
+          // print("Error accessing $apiUrl on attempt $attempt: $e");
         }
       }
       if (attempt < maxRetries) {
         final delay = initialRetryDelay * (1 << (attempt - 1));
-        print("Waiting for ${delay.inSeconds} seconds before retrying...");
+        // print("Waiting for ${delay.inSeconds} seconds before retrying...");
         await Future.delayed(delay);
       }
     }
