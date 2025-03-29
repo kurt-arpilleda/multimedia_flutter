@@ -311,7 +311,23 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
       );
     }
   }
-
+  Future<void> _showInputMethodPicker() async {
+    try {
+      if (Platform.isAndroid) {
+        const MethodChannel channel = MethodChannel('input_method_channel');
+        await channel.invokeMethod('showInputMethodPicker');
+      } else {
+        // iOS doesn't have this capability
+        Fluttertoast.showToast(
+          msg: "キーボードの選択はAndroidでのみ利用可能です。",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+        );
+      }
+    } catch (e) {
+      debugPrint("Error showing input method picker: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -508,6 +524,29 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                                       "保存",
                                       style: TextStyle(color: Colors.white, fontSize: 16),
                                     ),
+                                  ),
+                                ),
+                                SizedBox(height: 20), // Added spacing here
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 0), // Aligned with other labels
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "キーボード",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Spacer(),
+                                      IconButton(
+                                        icon: Icon(Icons.keyboard, size: 28), // Made icon bigger
+                                        iconSize: 28,
+                                        onPressed: () {
+                                          _showInputMethodPicker();
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
