@@ -332,7 +332,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
       } else {
         // iOS doesn't have this capability
         Fluttertoast.showToast(
-          msg: "Keyboard selection is only available on Android",
+          msg: "キーボードの選択はAndroidでのみ利用可能です。",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
         );
@@ -453,7 +453,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                                 Text(
                                   _firstName != null && _surName != null
                                       ? "$_firstName $_surName"
-                                      : "User Name",
+                                      : "ユーザー名",
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
@@ -486,7 +486,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                             child: Row(
                               children: [
                                 Text(
-                                  "Language",
+                                  "言語",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -533,21 +533,21 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 20), // Added spacing here
+                          SizedBox(height: 20),
                           Padding(
-                            padding: const EdgeInsets.only(left: 0), // Aligned with other labels
+                            padding: const EdgeInsets.only(left: 16.0),
                             child: Row(
                               children: [
                                 Text(
-                                  "Keyboard",
+                                  "キーボード",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Spacer(),
+                                SizedBox(width: 15), // Adjust this value as needed
                                 IconButton(
-                                  icon: Icon(Icons.keyboard, size: 28), // Made icon bigger
+                                  icon: Icon(Icons.keyboard, size: 28),
                                   iconSize: 28,
                                   onPressed: () {
                                     _showInputMethodPicker();
@@ -565,7 +565,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                     child: Row(
                       children: [
                         Text(
-                          "Country",
+                          "国",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

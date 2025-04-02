@@ -533,29 +533,29 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 20), // Added spacing here
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 0), // Aligned with other labels
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "Keyboard",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      IconButton(
-                                        icon: Icon(Icons.keyboard, size: 28), // Made icon bigger
-                                        iconSize: 28,
-                                        onPressed: () {
-                                          _showInputMethodPicker();
-                                        },
-                                      ),
-                                    ],
+                          SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "Keyboard",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                SizedBox(width: 15), // Adjust this value as needed
+                                IconButton(
+                                  icon: Icon(Icons.keyboard, size: 28),
+                                  iconSize: 28,
+                                  onPressed: () {
+                                    _showInputMethodPicker();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
