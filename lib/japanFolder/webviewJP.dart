@@ -462,6 +462,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
+                                      overflow: TextOverflow.ellipsis,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 SizedBox(height: 5),
