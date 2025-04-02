@@ -21,27 +21,6 @@ class AutoUpdate {
   static const int maxRetries = 6;
   static const Duration initialRetryDelay = Duration(seconds: 1);
 
-  Future<http.Response> _makeRequest(Uri uri, {Map<String, String>? headers, int retries = maxRetries}) async {
-    for (int attempt = 1; attempt <= retries; attempt++) {
-      for (String apiUrl in apiUrls) {
-        try {
-          final fullUri = Uri.parse(apiUrl).resolve(uri.toString());
-          final response = await http.get(fullUri, headers: headers).timeout(requestTimeout);
-          return response;
-        } catch (e) {
-          print("Error accessing $apiUrl on attempt $attempt: $e");
-        }
-      }
-      // If all servers fail, wait for an exponential backoff delay before retrying
-      if (attempt < retries) {
-        final delay = initialRetryDelay * (1 << (attempt - 1));
-        print("Waiting for ${delay.inSeconds} seconds before retrying...");
-        await Future.delayed(delay);
-      }
-    }
-    throw Exception("All API URLs are unreachable after $retries attempts");
-  }
-
   static Future<void> checkForUpdate(BuildContext context) async {
     for (int attempt = 1; attempt <= maxRetries; attempt++) {
       for (String apiUrl in apiUrls) {
