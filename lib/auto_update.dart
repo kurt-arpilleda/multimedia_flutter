@@ -187,7 +187,7 @@ class AutoUpdate {
       try {
         final Directory? externalDir = await getExternalStorageDirectory();
         if (externalDir != null) {
-          final String apkFilePath = "${externalDir.path}/multiSearch.apk";
+          final String apkFilePath = "${externalDir.path}/multiMedia.apk";
           final File apkFile = File(apkFilePath);
 
           final request = http.Request('GET', Uri.parse("$apiUrl$apkPath"));
