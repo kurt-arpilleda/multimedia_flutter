@@ -158,7 +158,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> {
         _currentLanguageFlag = flag;
       });
       try {
-        await apiService.updateLanguageFlag(_idNumber!, flag);
+        await apiServiceJP.updateLanguageFlag(_idNumber!, flag);
         await prefs.setInt('languageFlag', flag);
 
         if (webViewController != null) {
