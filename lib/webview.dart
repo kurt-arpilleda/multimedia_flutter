@@ -162,7 +162,12 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
         await prefs.setInt('languageFlag', flag);
 
         if (webViewController != null) {
-          await webViewController!.reload();
+          WebUri? currentUri = await webViewController!.getUrl();
+          if (currentUri != null) {
+            await webViewController!.loadUrl(urlRequest: URLRequest(url: currentUri));
+          } else {
+            await webViewController!.reload();
+          }
         }
       } catch (e) {
         print("Error updating language flag: $e");
