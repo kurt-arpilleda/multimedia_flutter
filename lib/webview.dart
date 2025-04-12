@@ -417,7 +417,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
               toolbarHeight: kToolbarHeight - 20,
               leading: IconButton(
                 padding: EdgeInsets.zero,
-                iconSize: 28,
+                iconSize: 30,
                 icon: Icon(
                   Icons.settings,
                   color: Colors.white,
@@ -447,10 +447,10 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
               actions: [
                 IconButton(
                   padding: EdgeInsets.zero,
-                  iconSize: 24,
+                  iconSize: 25,
                   icon: Container(
-                    width: 24,
-                    height: 24,
+                    width: 25,
+                    height: 25,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.red,
@@ -458,7 +458,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
                     child: Icon(
                       Icons.close,
                       color: Colors.white,
-                      size: 21,
+                      size: 25,
                     ),
                   ),
                   onPressed: () {
