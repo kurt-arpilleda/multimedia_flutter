@@ -22,7 +22,7 @@ class SoftwareWebViewScreen extends StatefulWidget {
   _SoftwareWebViewScreenState createState() => _SoftwareWebViewScreenState();
 }
 
-class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
+class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ApiService apiService = ApiService();
   final ApiServiceJP apiServiceJP = ApiServiceJP();
@@ -48,7 +48,30 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
+    _initializePullToRefresh();
+    _fetchInitialData();
+    _checkForUpdates();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    webViewController?.stopLoading();
+    pullToRefreshController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshAllData();
+      _checkForUpdates();
+    }
+  }
+
+  void _initializePullToRefresh() {
     pullToRefreshController = PullToRefreshController(
       settings: PullToRefreshSettings(
         color: Colors.blue,
@@ -59,12 +82,45 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
         }
       },
     );
-    _fetchAndLoadUrl();
-    _fetchDeviceInfo();
-    _loadCurrentLanguageFlag();
-    _loadPhOrJp();
+  }
 
-    AutoUpdate.checkForUpdate(context);
+  Future<void> _checkForUpdates() async {
+    try {
+      await AutoUpdate.checkForUpdate(context);
+    } catch (e) {
+      // Handle error if update check fails
+      debugPrint('Update check failed: $e');
+    }
+  }
+
+  Future<void> _fetchInitialData() async {
+    await _fetchAndLoadUrl();
+    await _fetchDeviceInfo();
+    await _loadCurrentLanguageFlag();
+    await _loadPhOrJp();
+  }
+
+  Future<void> _refreshAllData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _loadPhOrJp();
+      await _loadCurrentLanguageFlag();
+      await _fetchDeviceInfo();
+      if (webViewController != null) {
+        await webViewController!.reload();
+      } else {
+        await _fetchAndLoadUrl();
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   Future<void> _fetchDeviceInfo() async {
@@ -73,7 +129,6 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> {
       if (deviceId == null) {
         throw Exception("Unable to get device ID");
       }
-
       final deviceResponse = await apiService.checkDeviceId(deviceId);
       if (deviceResponse['success'] == true && deviceResponse['idNumber'] != null) {
         setState(() {
