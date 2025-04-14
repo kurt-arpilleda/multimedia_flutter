@@ -198,7 +198,7 @@ class ApiServiceJP {
             // Store the idNumber if it exists
             if (data['success'] == true && data['idNumber'] != null) {
               final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('IDNumber', data['idNumber']);
+              await prefs.setString('IDNumberJP', data['idNumber']);
             }
             return data;
           }

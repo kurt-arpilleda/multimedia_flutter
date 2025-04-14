@@ -104,7 +104,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> with Wi
     try {
       // Get the stored IDNumber from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      String? storedIdNumber = prefs.getString('IDNumber');
+      String? storedIdNumber = prefs.getString('IDNumberJP');
 
       // Get the latest IDNumber from the server
       String? deviceId = await UniqueIdentifier.serial;
@@ -173,7 +173,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> with Wi
       if (deviceResponse['success'] == true && deviceResponse['idNumber'] != null) {
         // Store the IDNumber in SharedPreferences (in case it's not already saved by the API)
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('IDNumber', deviceResponse['idNumber']);
+        await prefs.setString('IDNumberJP', deviceResponse['idNumber']);
 
         setState(() {
           _idNumber = deviceResponse['idNumber'];
