@@ -112,7 +112,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> with Wi
         return true; // If we can't get device ID, refetch to be safe
       }
 
-      final deviceResponse = await apiService.checkDeviceId(deviceId);
+      final deviceResponse = await apiServiceJP.checkDeviceId(deviceId);
       String? serverIdNumber = deviceResponse['success'] == true ? deviceResponse['idNumber'] : null;
 
       // If either IDNumber is null or they don't match, we should refetch the URL
@@ -169,7 +169,7 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> with Wi
         throw Exception("Unable to get device ID");
       }
 
-      final deviceResponse = await apiService.checkDeviceId(deviceId);
+      final deviceResponse = await apiServiceJP.checkDeviceId(deviceId);
       if (deviceResponse['success'] == true && deviceResponse['idNumber'] != null) {
         // Store the IDNumber in SharedPreferences (in case it's not already saved by the API)
         final prefs = await SharedPreferences.getInstance();
