@@ -5,6 +5,7 @@ import '../api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../auto_update.dart';
+import '../pdfViewer.dart';
 import 'api_serviceJP.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
@@ -66,8 +67,10 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> with Wi
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // _refreshAllData();
-      _checkForUpdates();
+      // Only check for updates if we're not already in the middle of an update
+      if (!AutoUpdate.isUpdating) {
+        _checkForUpdates();
+      }
     }
   }
 
@@ -654,6 +657,51 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreenJP> with Wi
                                   iconSize: 28,
                                   onPressed: () {
                                     _showInputMethodPicker();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 46.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "手引き",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: 15),
+                                IconButton(
+                                  icon: Icon(Icons.menu_book, size: 28),
+                                  iconSize: 28,
+                                  onPressed: () async {
+                                    if (_idNumber == null || _currentLanguageFlag == null) return;
+
+                                    try {
+                                      final manualUrl = await apiService.fetchManualLink(widget.linkID, _currentLanguageFlag!);
+                                      final fileName = 'manual_${widget.linkID}_${_currentLanguageFlag}.pdf';
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => PDFViewerScreen(
+                                            pdfUrl: manualUrl,
+                                            fileName: fileName,
+                                            languageFlag: _currentLanguageFlag!, // Add this line
+                                          ),
+                                        ),
+                                      );
+                                    } catch (e) {
+                                      Fluttertoast.showToast(
+                                        msg: "Error loading manual: ${e.toString()}",
+                                        toastLength: Toast.LENGTH_LONG,
+                                        gravity: ToastGravity.BOTTOM,
+                                      );
+                                    }
                                   },
                                 ),
                               ],
