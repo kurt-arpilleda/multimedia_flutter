@@ -241,7 +241,6 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
         _showCountryLoginDialog(context, value);
         return;
       }
-
       // Get the appropriate service based on the selected country
       dynamic service = value == "jp" ? apiServiceJP : apiService;
 
@@ -424,6 +423,111 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
       }
     });
   }
+
+  Future<void> _setupInputFieldDetection() async {
+    if (webViewController != null) {
+      String jsCode = '''
+(function() {
+  let button;
+  let container;
+
+  function isVisible(elem) {
+    if (!elem || elem.offsetParent === null) return false;
+    
+    const rect = elem.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const topElem = document.elementFromPoint(centerX, centerY);
+    return topElem === elem || elem.contains(topElem);
+  }
+
+  function updateBarcodeScannerButton() {
+    const input = document.getElementById('search');
+    if (!input) return;
+
+    const shouldShow = isVisible(input);
+
+    // If it should be visible and not already added
+    if (shouldShow && !input.dataset.hasBarcodeButton) {
+      input.dataset.hasBarcodeButton = 'true';
+
+      container = document.createElement('div');
+      container.style.position = 'relative';
+      container.style.display = 'inline-block';
+      container.style.width = '100%';
+
+      input.parentNode.insertBefore(container, input);
+      container.appendChild(input);
+
+      button = document.createElement('div');
+      button.innerHTML = '𝄃𝄂𝄂𝄀𝄁𝄃';
+      button.style.cssText = \`
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 9999;
+        background: #3452B4;
+        color: white;
+        padding: 0 4px;
+        border-radius: 4px;
+        font-size: 10px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        font-family: Arial, sans-serif;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      \`;
+
+      button.onclick = function(e) {
+        e.stopPropagation();
+        window.flutter_inappwebview.callHandler('openBarcodeScanner');
+      };
+
+      container.appendChild(button);
+    }
+
+    // If the input is now hidden or behind modal, remove the button
+    if (!shouldShow && button && container && container.parentNode) {
+      input.removeAttribute('data-has-barcode-button');
+      container.parentNode.insertBefore(input, container);
+      container.remove();
+      button = null;
+      container = null;
+    }
+  }
+
+  // Initial check
+  updateBarcodeScannerButton();
+
+  // Observe DOM for changes (e.g., modal open/close)
+  const observer = new MutationObserver(function() {
+    updateBarcodeScannerButton();
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['style', 'class']
+  });
+
+  // Also check every second in case changes aren't caught by observer
+  setInterval(updateBarcodeScannerButton, 1000);
+})();
+''';
+
+      try {
+        await webViewController!.evaluateJavascript(source: jsCode);
+      } catch (e) {
+        print('Error setting up input field detection: \$e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -697,6 +801,76 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
                               ],
                             ),
                           ),
+                          SizedBox(height: 20),
+                          // Padding(
+                          //   padding: EdgeInsets.only(
+                          //     left: _currentLanguageFlag == 2 ? 58.0 : 32.0,
+                          //   ),
+                          //   child: Row(
+                          //     children: [
+                          //       Text(
+                          //         _currentLanguageFlag == 2
+                          //             ? 'メモ'
+                          //             : 'Memo',
+                          //         style: TextStyle(
+                          //           fontSize: 16,
+                          //           fontWeight: FontWeight.bold,
+                          //         ),
+                          //       ),
+                          //       SizedBox(width: 15),
+                          //       IconButton(
+                          //         icon: Container(
+                          //           width: 40,
+                          //           height: 40,
+                          //           decoration: BoxDecoration(
+                          //             color: Color(0xFFE91E63),
+                          //             shape: BoxShape.circle,
+                          //             border: Border.all(
+                          //               color: Colors.white,
+                          //               width: 2,
+                          //             ),
+                          //             boxShadow: [
+                          //               BoxShadow(
+                          //                 color: Colors.black.withOpacity(0.3),
+                          //                 blurRadius: 4,
+                          //                 offset: Offset(2, 2),
+                          //               ),
+                          //             ],
+                          //           ),
+                          //           child: Transform(
+                          //             alignment: Alignment.center,
+                          //             transform: Matrix4.identity()..scale(-1.0, 1.0),
+                          //             child: Icon(
+                          //               Icons.mode_comment_outlined,
+                          //               color: Colors.white,
+                          //               size: 20,
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         onPressed: () async {
+                          //           // Close the drawer first
+                          //           Navigator.of(context).pop();
+                          //
+                          //           if (webViewController != null) {
+                          //             try {
+                          //               await webViewController!.evaluateJavascript(
+                          //                 source: "document.getElementById('memoBtn').click();",
+                          //               );
+                          //             } catch (e) {
+                          //               Fluttertoast.showToast(
+                          //                 msg: _currentLanguageFlag == 2
+                          //                     ? "メモボタンをクリックできませんでした"
+                          //                     : "Could not click memo button",
+                          //                 toastLength: Toast.LENGTH_SHORT,
+                          //                 gravity: ToastGravity.BOTTOM,
+                          //               );
+                          //             }
+                          //           }
+                          //         },
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -861,18 +1035,23 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
                       _progress = 0;
                     });
                   },
-                  onLoadStop: (controller, url) {
+                  onLoadStop: (controller, url) async {
                     pullToRefreshController?.endRefreshing();
                     setState(() {
                       _isLoading = false;
                       _progress = 1;
                     });
+
+                    // Setup input field detection after page loads
+                    await Future.delayed(Duration(milliseconds: 1000));
+                    await _setupInputFieldDetection();
                   },
                   onProgressChanged: (controller, progress) {
                     setState(() {
                       _progress = progress / 100;
                     });
                   },
+                  // ... rest of your existing InAppWebView configuration
                   onReceivedServerTrustAuthRequest: (controller, challenge) async {
                     return ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
                   },
@@ -894,7 +1073,6 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
                       action: allGranted ? PermissionResponseAction.GRANT : PermissionResponseAction.DENY,
                     );
                   },
-                  // Handle download links by opening in external browser
                   shouldOverrideUrlLoading: (controller, navigationAction) async {
                     final url = navigationAction.request.url?.toString() ?? '';
 
@@ -903,11 +1081,9 @@ class _SoftwareWebViewScreenState extends State<SoftwareWebViewScreen> with Widg
                       return NavigationActionPolicy.CANCEL;
                     }
 
-                    // Use debounced navigation for regular links
                     _debounceNavigation(url);
                     return NavigationActionPolicy.CANCEL;
                   },
-                  // Also handle explicit download requests
                   onDownloadStartRequest: (controller, downloadStartRequest) async {
                     await _launchInBrowser(downloadStartRequest.url.toString());
                   },
